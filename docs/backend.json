@@ -1,0 +1,104 @@
+{
+  "entities": {
+    "DailyContent": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "DailyContent",
+      "type": "object",
+      "description": "Represents the daily content including thought for the day, song, shloka, and panchanga.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the daily content."
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the daily content."
+        },
+        "content": {
+          "type": "string",
+          "description": "The main content of the item, which can be text or HTML."
+        },
+        "community": {
+          "type": "string",
+          "description": "The community associated with the content."
+        },
+        "zone": {
+          "type": "string",
+          "description": "The zone associated with the content. Can be null."
+        },
+        "category": {
+          "type": "string",
+          "description": "The category of the content (e.g., routine)."
+        },
+        "type": {
+          "type": "string",
+          "description": "The type of content (e.g., quote, shloka, song)."
+        },
+        "subtype": {
+          "type": "string",
+          "description": "The subtype of content (e.g., community)."
+        },
+        "isVisible": {
+          "type": "boolean",
+          "description": "Indicates whether the content is visible."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the content was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the content was last updated.",
+          "format": "date-time"
+        },
+        "sequence": {
+          "type": "number",
+          "description": "Sequence number for ordering content."
+        },
+        "media": {
+          "type": "string",
+          "description": "URL of the media associated with the content. Can be null."
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "content",
+        "category",
+        "type",
+        "isVisible",
+        "createdAt",
+        "updatedAt",
+        "sequence"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/daily_content/{dailyContentId}",
+        "definition": {
+          "entityName": "DailyContent",
+          "schema": {
+            "$ref": "#/backend/entities/DailyContent"
+          },
+          "description": "Collection of daily content items, including thought for the day, songs, shlokas, and panchanga. Each document represents a single content item.",
+          "params": [
+            {
+              "name": "dailyContentId",
+              "description": "Unique identifier for the daily content document."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "Given the requirement to fetch daily content (thought for the day, song, shloka, and panchanga) from Firestore and display them in a Next.js application, a flat collection structure is the most suitable. This structure prioritizes simplicity and efficiency for retrieval, as there are no complex relationships between data.  Each document within the `daily_content` collection will represent a single piece of content, categorized by its `category` field. This approach supports straightforward queries to fetch content based on category (e.g., all 'thought for the day' entries). It supports the required QAPs by enabling secure `list` operations. Since all documents in the collection share the same security requirements (publicly visible content), structural segregation is achieved.  Authorization Independence isn't a primary concern here as there are no specific access control requirements beyond basic visibility.  The structure assumes that all content within this collection is publicly accessible or controlled by simple rules based on the 'isVisible' field."
+  }
+}
