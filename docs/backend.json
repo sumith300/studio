@@ -38,16 +38,16 @@
           "type": "string",
           "description": "The subtype of content (e.g., community)."
         },
-        "isVisible": {
+        "is_visible": {
           "type": "boolean",
           "description": "Indicates whether the content is visible."
         },
-        "createdAt": {
+        "created_at": {
           "type": "string",
           "description": "Timestamp indicating when the content was created.",
           "format": "date-time"
         },
-        "updatedAt": {
+        "updated_at": {
           "type": "string",
           "description": "Timestamp indicating when the content was last updated.",
           "format": "date-time"
@@ -67,9 +67,9 @@
         "content",
         "category",
         "type",
-        "isVisible",
-        "createdAt",
-        "updatedAt",
+        "is_visible",
+        "created_at",
+        "updated_at",
         "sequence"
       ]
     }
@@ -99,6 +99,6 @@
         }
       }
     ],
-    "reasoning": "Given the requirement to fetch daily content (thought for the day, song, shloka, and panchanga) from Firestore and display them in a Next.js application, a flat collection structure is the most suitable. This structure prioritizes simplicity and efficiency for retrieval, as there are no complex relationships between data.  Each document within the `daily_content` collection will represent a single piece of content, categorized by its `category` field. This approach supports straightforward queries to fetch content based on category (e.g., all 'thought for the day' entries). It supports the required QAPs by enabling secure `list` operations. Since all documents in the collection share the same security requirements (publicly visible content), structural segregation is achieved.  Authorization Independence isn't a primary concern here as there are no specific access control requirements beyond basic visibility.  The structure assumes that all content within this collection is publicly accessible or controlled by simple rules based on the 'isVisible' field."
+    "reasoning": "Given the requirement to fetch daily content (thought for the day, song, shloka, and panchanga) from Firestore and display them in a Next.js application, a flat collection structure is the most suitable. This structure prioritizes simplicity and efficiency for retrieval, as there are no complex relationships between data.  Each document within the `daily_content` collection will represent a single piece of content, categorized by its `category` field. This approach supports straightforward queries to fetch content based on category (e.g., all 'thought for the day' entries). It supports the required QAPs by enabling secure `list` operations. Since all documents in the collection share the same security requirements (publicly visible content), structural segregation is achieved.  Authorization Independence isn't a primary concern here as there are no specific access control requirements beyond basic visibility.  The structure assumes that all content within this collection is publicly accessible or controlled by simple rules based on the 'is_visible' field."
   }
 }
