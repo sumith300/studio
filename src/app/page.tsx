@@ -34,7 +34,6 @@ export default function Home() {
     setIsSeeding(true);
     await seedDatabase(firestore);
     setIsSeeding(false);
-    window.location.reload();
   };
 
   const getIcon = (type: DailyContent['type']) => {
@@ -77,8 +76,8 @@ export default function Home() {
           </p>
         </div>
 
-        {tabs.length > 0 ? (
-          <Tabs defaultValue={tabs[0].value} className="w-full">
+        {allContent && allContent.length > 0 ? (
+          <Tabs defaultValue={tabs.length > 0 ? tabs[0].value : ''} className="w-full">
             <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 h-auto md:h-12 bg-muted/50 backdrop-blur-sm">
               {tabs.map((tab) => (
                 <TabsTrigger key={tab.value} value={tab.value} className="capitalize text-xs md:text-sm py-2 md:py-0">
@@ -115,7 +114,7 @@ export default function Home() {
         ) : (
           <div className="text-center">
             <p className="mb-4">Your database is empty. Click the button to populate it with sample content.</p>
-            <Button onClick={handleSeedData} disabled={isSeeding}>
+            <Button onClick={handleSeedData} disabled={isSeeding || isLoading}>
               {isSeeding ? 'Adding data...' : 'Add Sample Data to Firebase'}
             </Button>
           </div>
