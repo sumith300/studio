@@ -22,6 +22,7 @@ import { collection } from 'firebase/firestore';
 import type { DailyContent } from '@/types';
 import Loading from './loading';
 import { seedDatabase } from '@/lib/seed-db';
+import AddContentDialog from '@/components/add-content-dialog';
 
 export default function Home() {
   const firestore = useFirestore();
@@ -69,11 +70,15 @@ export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-4 md:p-24 bg-background text-foreground font-body">
       <div className="z-10 w-full max-w-5xl items-center justify-between text-sm lg:flex flex-col">
-        <div className="text-center mb-12">
+        <div className="text-center mb-8">
           <h1 className="text-4xl md:text-5xl font-headline font-bold text-primary">Daily Sangama</h1>
           <p className="text-lg md:text-xl text-muted-foreground mt-2">
             Your daily dose of wisdom and culture, from the heart of tradition.
           </p>
+        </div>
+
+        <div className="w-full flex justify-end mb-4">
+          <AddContentDialog dailyContentRef={dailyContentRef} />
         </div>
 
         {allContent && allContent.length > 0 ? (
@@ -91,7 +96,7 @@ export default function Home() {
             {tabs.map((tab) => (
               <TabsContent key={tab.value} value={tab.value} className="mt-6">
                 <div className="grid gap-6 md:grid-cols-2">
-                  {tab.content.map((item) => (
+                  {tab.content.sort((a, b) => a.sequence - b.sequence).map((item) => (
                     <Card key={item.id} className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
                       <CardHeader>
                         <CardTitle className="text-xl font-headline text-primary">{item.title}</CardTitle>
