@@ -1,4 +1,5 @@
 'use client';
+import { useState, useEffect } from 'react';
 import {
   Tabs,
   TabsContent,
@@ -15,24 +16,20 @@ import {
 import { Quote, Music, BookOpenText, CalendarDays } from "lucide-react";
 import ContentRenderer from "@/components/content-renderer";
 import AudioPlayer from "@/components/audio-player";
-import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
-import { collection, query, where, orderBy } from 'firebase/firestore';
+import { getDailyContent } from '@/lib/data';
 import type { DailyContent } from '@/types';
 import Loading from './loading';
 
 export default function Home() {
-  const firestore = useFirestore();
+  const [allContent, setAllContent] = useState<DailyContent[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const contentQuery = useMemoFirebase(() => {
-    if (!firestore) return null;
-    return query(
-      collection(firestore, 'daily_content'),
-      where('is_visible', '==', true),
-      orderBy('sequence', 'asc')
-    );
-  }, [firestore]);
-
-  const { data: allContent, isLoading } = useCollection<DailyContent>(contentQuery);
+  useEffect(() => {
+    getDailyContent().then(data => {
+      setAllContent(data);
+      setIsLoading(false);
+    });
+  }, []);
 
   const getIcon = (type: DailyContent['type']) => {
     switch (type) {
