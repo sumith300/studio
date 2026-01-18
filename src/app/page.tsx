@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
   Tabs,
   TabsContent,
@@ -13,23 +13,29 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Button } from '@/components/ui/button';
 import { Quote, Music, BookOpenText, CalendarDays } from "lucide-react";
 import ContentRenderer from "@/components/content-renderer";
 import AudioPlayer from "@/components/audio-player";
-import { getDailyContent } from '@/lib/data';
+import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
+import { collection } from 'firebase/firestore';
 import type { DailyContent } from '@/types';
 import Loading from './loading';
+import { seedDatabase } from '@/lib/seed-db';
 
 export default function Home() {
-  const [allContent, setAllContent] = useState<DailyContent[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const firestore = useFirestore();
+  const dailyContentRef = useMemoFirebase(() => firestore ? collection(firestore, 'daily_content') : null, [firestore]);
+  const { data: allContent, isLoading } = useCollection<DailyContent>(dailyContentRef);
+  const [isSeeding, setIsSeeding] = useState(false);
 
-  useEffect(() => {
-    getDailyContent().then(data => {
-      setAllContent(data);
-      setIsLoading(false);
-    });
-  }, []);
+  const handleSeedData = async () => {
+    if (!firestore) return;
+    setIsSeeding(true);
+    await seedDatabase(firestore);
+    setIsSeeding(false);
+    window.location.reload();
+  };
 
   const getIcon = (type: DailyContent['type']) => {
     switch (type) {
@@ -57,7 +63,7 @@ export default function Home() {
       }))
     : [];
 
-  if (isLoading) {
+  if (isLoading && !allContent) {
     return <Loading />;
   }
 
@@ -107,7 +113,12 @@ export default function Home() {
             ))}
           </Tabs>
         ) : (
-          !isLoading && <p>No content available at the moment. Please check back later.</p>
+          <div className="text-center">
+            <p className="mb-4">Your database is empty. Click the button to populate it with sample content.</p>
+            <Button onClick={handleSeedData} disabled={isSeeding}>
+              {isSeeding ? 'Adding data...' : 'Add Sample Data to Firebase'}
+            </Button>
+          </div>
         )}
       </div>
     </main>

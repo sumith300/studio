@@ -1,61 +1,15 @@
-/**
- * This ruleset provides security for a Firestore database that manages daily content.
- *
- * Core Philosophy:
- * The security model is designed to be "Public Read, Admin Write". All content stored
- * in the database is considered public and can be read by any client, including
- * unauthenticated users. All write operations (create, update, delete) are
- * explicitly denied by default, enforcing a secure posture that assumes such
- * modifications should only be performed by a designated administrative user
- * through a trusted backend or a future admin-specific rule.
- *
- * Data Structure:
- * The data is organized into a single, flat top-level collection:
- * - /daily_content/{dailyContentId}: Contains individual content items like quotes,
- *   songs, or thoughts for the day.
- *
- * Key Security Decisions:
- * - Public Read Access: The `/daily_content` collection is fully open for read
- *   (`get`) and list (`list`) operations to allow the application to easily fetch
- *   and display content to all users.
- * - Write Lock-down: All write operations are disabled (`if false;`). This is a
- *   critical security measure because the data model does not specify an owner or
- *   author for the content, making it impossible to implement user-specific write
- *   permissions safely. A TODO has been added to guide the implementation of
- *   admin-only rules.
- * - No Data Validation: In line with the prototyping philosophy, these rules do not
- *   validate the shape or type of data being written, as all writes are currently
- *   denied.
- */
+
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    /**
-     * @description
-     * Provides public read-only access to daily content like quotes and songs.
-     * Write access is completely denied until an admin role is implemented.
-     * @path
-     * /daily_content/{dailyContentId}
-     * @allow
-     * Any user, authenticated or not, can read a piece of daily content. (get)
-     * @deny
-     * Any user attempting to create, update, or delete content will be denied. (create)
-     * @principle
-     * Public read-only data. All write operations are disabled by default for security until an administrative role is defined.
-     */
     match /daily_content/{dailyContentId} {
-      // Allow any user, even unauthenticated ones, to get or list daily content.
-      // The client application is responsible for filtering content based on the
-      // 'isVisible' field, as this cannot be enforced in a 'list' rule.
-      allow get: if true;
-      allow list: if true;
+      // Allow public read access. Any client can get or list documents
+      // in this collection.
+      allow read: if true;
 
-      // CRITICAL: Cannot implement owner-only writes. The 'DailyContent' entity is missing an 'ownerId' or 'authorId' field.
-      // All write operations are denied by default for security.
-      allow create: if false; // TODO: Implement admin-only rules once an admin role is defined.
-      allow update: if false; // TODO: Implement admin-only rules once an admin role is defined.
-      allow delete: if false; // TODO: Implement admin-only rules once an admin role is defined.
+      // Deny all write operations by default. Data should be added via a
+      // trusted backend, the Firebase console, or a specific seeding script.
+      allow write: if false;
     }
   }
 }
